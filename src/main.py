@@ -2,18 +2,20 @@ from fastapi import FastAPI
 import process
 import asyncio
 
+
 from prometheus.routes import router as prometheus_router
+from healthcheck.routes import router as healthcheck_router
 from postgres.create_db import create_db
 from postgres.connect_db import DatabaseConnection
 
 
-app = FastAPI(title='Gandoo',
+app = FastAPI(title='gwando',
               debug=True,
               root_path='/')
 
 
 app.include_router(prometheus_router)
-#app.include_router(healthcheck_router)
+app.include_router(healthcheck_router)
 
 
 @app.on_event('startup')

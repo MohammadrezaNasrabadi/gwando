@@ -1,5 +1,6 @@
 from custom_logger import get_custom_logger
 from .connect_db import DatabaseConnection
+from healthcheck.healthcheck import HealthCheck
 
 
 logger = get_custom_logger(__name__)
@@ -22,5 +23,6 @@ def create_db():
         connection.commit()
     except Exception as e:
         logger.error("failed to create table.")
+        HealthCheck.set_status(False)
         connection.rollback()
         raise e

@@ -2,6 +2,8 @@ from postgres.insert_db import insert_db
 from prometheus import metrics
 from custom_logger import get_custom_logger
 from postgres.schema import Data
+from healthcheck.healthcheck import HealthCheck
+
 
 import redis.asyncio as redis
 import requests
@@ -15,7 +17,7 @@ from bs4 import BeautifulSoup
 logger = get_custom_logger(__name__)
 
 
-redis_channel_name = os.getenv('REDIS_CHANNEL_NAME', 'gandoo')
+redis_channel_name = os.getenv('REDIS_CHANNEL_NAME', 'gwando')
 redis_host = os.getenv('REDIS_HOST', 'redis')
 redis_client = redis.StrictRedis(host=redis_host, port=6379)
 
@@ -44,13 +46,17 @@ async def _fetch_url(map):
             logger.info(f'url {url} successfully fetched.')
             included_urls = _get_included_urls(response.content)
             metrics.CRAWLER_SUCCESS_TOTAL.inc()
+        elif response.status_code == 403:
+            logger.warn(f'unauthorized access. maybe issuing CAPTCHA challenge. {url}')
+            status_code = response.status_code
+            raise "unauthorized access."
         else:
             logger.warn(f'could not fetch the url {url}.')
-            included_urls = []
             metrics.CRAWLER_ERROR_TOTAL.inc()
         status_code = response.status_code
     except Exception as e:
         logger.error(f'failed to fetch the url {url}.')
+        HealthCheck.set_status(False)
         metrics.CRAWLER_ERROR_TOTAL.inc()
 
     data = {

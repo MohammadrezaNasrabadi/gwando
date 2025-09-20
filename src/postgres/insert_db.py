@@ -1,8 +1,9 @@
 from psycopg2 import sql
+
+
 from .connect_db import DatabaseConnection
 from .schema import Data
-
-
+from healthcheck.healthcheck import HealthCheck
 from custom_logger import get_custom_logger
 
 
@@ -22,4 +23,5 @@ async def insert_db(data: Data):
         connection.commit()
     except Exception as e:
         connection.rollback()
+        HealthCheck.set_status(False)
         logger.warn("failed to insert record to database.")

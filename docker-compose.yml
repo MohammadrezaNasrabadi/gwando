@@ -15,9 +15,9 @@ services:
     environment:
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-password}
       POSTGRES_USER: ${DATABASE_USER:-postgres}
-      POSTGRES_DB: ${DATABASE_NAME:-gandoo}
+      POSTGRES_DB: ${DATABASE_NAME:-gwando}
     restart: always
-  gandoo:
+  gwando:
     build: .
     ports:
       - 8000:8000
@@ -25,9 +25,14 @@ services:
       DATABASE_HOST: ${DATABASE_HOST:-postgres}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD:-password}
       DATABASE_USER: ${DATABASE_USER:-postgres}
-      DATABASE_NAME: ${DATABASE_NAME:-gandoo}
+      DATABASE_NAME: ${DATABASE_NAME:-gwando}
       REDIS_HOST: ${REDIS_HOST:-redis}
-      REDIS_CHANNEL_NAME: ${REDIS_CHANNEL_NAME:-gandoo}
+      REDIS_CHANNEL_NAME: ${REDIS_CHANNEL_NAME:-gwando}
+      healthcheck:
+        test: ["CMD", "curl", "--fail", "http://localhost:8000/healthy"]
+        interval: 30s
+        timeout: 5s
+        retries: 3
     depends_on:
       - redis
       - postgres
