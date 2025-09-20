@@ -1,0 +1,37 @@
+services:
+  redis:
+    image: redis:8.2.1
+    ports:
+      - 6379:6379
+    volumes:
+      - redis_data:/data
+    restart: always
+  postgres:
+    image: postgres:17.6
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-password}
+      POSTGRES_USER: ${DATABASE_USER:-postgres}
+      POSTGRES_DB: ${DATABASE_NAME:-gandoo}
+    restart: always
+  gandoo:
+    build: .
+    ports:
+      - 8000:8000
+    environment:
+      DATABASE_HOST: ${DATABASE_HOST:-postgres}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-password}
+      DATABASE_USER: ${DATABASE_USER:-postgres}
+      DATABASE_NAME: ${DATABASE_NAME:-gandoo}
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_CHANNEL_NAME: ${REDIS_CHANNEL_NAME:-gandoo}
+    depends_on:
+      - redis
+      - postgres
+    restart: always
+volumes:
+  redis_data:
+  postgres_data:
