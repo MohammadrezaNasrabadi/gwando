@@ -64,6 +64,14 @@ docker compose up -d
 
 After the setup was completed and all services are up and running, the Worker will be available on `http://127.0.0.1:8000`
 
+4. **Pubish URL to redis**
+
+URLs to be crawled can be published to redis via `url-scheduler.sh` script. For example:
+
+```bash
+./url-scheduler.sh https://google.com
+```
+
 ## Configuration
 
 The application is configured using environment variables. The supported variables are as below:
