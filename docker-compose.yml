@@ -1,5 +1,6 @@
 services:
   redis:
+    container_name: redis
     image: redis:8.2.1
     ports:
       - 6379:6379
@@ -7,6 +8,7 @@ services:
       - redis_data:/data
     restart: always
   postgres:
+    container_name: postgres
     image: postgres:17.6
     ports:
       - 5432:5432
@@ -18,6 +20,7 @@ services:
       POSTGRES_DB: ${DATABASE_NAME:-gwando}
     restart: always
   gwando:
+    container_name: gwando
     build: .
     ports:
       - 8000:8000
@@ -28,15 +31,17 @@ services:
       DATABASE_NAME: ${DATABASE_NAME:-gwando}
       REDIS_HOST: ${REDIS_HOST:-redis}
       REDIS_CHANNEL_NAME: ${REDIS_CHANNEL_NAME:-gwando}
-      healthcheck:
-        test: ["CMD", "curl", "--fail", "http://localhost:8000/healthy"]
-        interval: 30s
-        timeout: 5s
-        retries: 3
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8000/healthy"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
     depends_on:
       - redis
       - postgres
     restart: always
 volumes:
   redis_data:
+    name: redis_data
   postgres_data:
+    name: postgres_data
